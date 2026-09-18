@@ -172,7 +172,10 @@ export function buildDecorations(view: DecorationInput): Built {
           let owner = node.node.parent
           while (owner && owner.name !== 'Blockquote') owner = owner.parent
           if (owner && !selectionTouches(state, owner.from, owner.to)) {
-            hide(node.from, node.to)
+            // 连同分隔空白一起隐藏，否则正文会留一个空格宽度的缩进。
+            // 只在后一个字符确实是空白时扩展，保证不会吞掉正文。
+            const sep = state.doc.sliceString(node.to, node.to + 1)
+            hide(node.from, sep === ' ' || sep === '\t' ? node.to + 1 : node.to)
           }
           return
         }
