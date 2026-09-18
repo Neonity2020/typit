@@ -167,8 +167,11 @@ export function buildDecorations(view: DecorationInput): Built {
           return
         }
         if (name === 'QuoteMark') {
-          const parent = node.node.parent
-          if (parent && parent.name === 'Blockquote' && !selectionTouches(state, parent.from, parent.to)) {
+          // 只有首行的 QuoteMark 是 Blockquote 的直接子节点，续行的挂在 Paragraph 下，
+          // 所以必须向上找最近的 Blockquote 祖先，只看 parent 会让续行的 ">" 永远露着。
+          let owner = node.node.parent
+          while (owner && owner.name !== 'Blockquote') owner = owner.parent
+          if (owner && !selectionTouches(state, owner.from, owner.to)) {
             hide(node.from, node.to)
           }
           return
