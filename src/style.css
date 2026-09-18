@@ -1,0 +1,190 @@
+:root {
+  --bg: #ffffff;
+  --fg: #1f2328;
+  --dim: #6e7681;
+  --accent: #0969da;
+  --code-bg: rgba(175, 184, 233, 0.22);
+  --code-block-bg: #f6f8fa;
+  --quote-border: #d1d5db;
+  --quote-fg: #57606a;
+  --border: #e5e7eb;
+  --syn-keyword: #a626a4;
+  --syn-string: #50a14f;
+  --syn-number: #986801;
+  --syn-comment: #a0a1a7;
+  --syn-fn: #4078f2;
+  --syn-type: #c18401;
+  --syn-variable: #383a42;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1e1f22;
+    --fg: #d7dce2;
+    --dim: #9ca3af;
+    --accent: #539bf5;
+    --code-bg: rgba(101, 117, 150, 0.28);
+    --code-block-bg: #26282e;
+    --quote-border: #4b5563;
+    --quote-fg: #9ca3af;
+    --border: #34383f;
+    --syn-keyword: #c678dd;
+    --syn-string: #98c379;
+    --syn-number: #d19a66;
+    --syn-comment: #7f848e;
+    --syn-fn: #61afef;
+    --syn-type: #e5c07b;
+    --syn-variable: #abb2bf;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", sans-serif;
+  overflow: hidden;
+}
+
+#editor {
+  height: calc(100% - 28px);
+}
+
+#editor .cm-editor {
+  height: 100%;
+  background: var(--bg);
+}
+
+#editor .cm-editor.cm-focused {
+  outline: none;
+}
+
+#editor .cm-scroller {
+  font-family: inherit;
+  line-height: 1.75;
+}
+
+#editor .cm-content {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 3rem 2rem 40vh;
+  caret-color: var(--fg);
+}
+
+#editor .cm-cursor {
+  border-left-width: 2px;
+  border-color: var(--accent);
+}
+
+::selection {
+  background: rgba(9, 105, 218, 0.22);
+}
+
+/* ---- live preview 装饰 ---- */
+
+.typit-h1 {
+  font-size: 1.9em;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.typit-h2 {
+  font-size: 1.55em;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.typit-h3 {
+  font-size: 1.3em;
+  font-weight: 650;
+}
+
+.typit-h4 {
+  font-size: 1.15em;
+  font-weight: 650;
+}
+
+.typit-h5 {
+  font-size: 1em;
+  font-weight: 650;
+}
+
+.typit-h6 {
+  font-size: 0.95em;
+  font-weight: 600;
+  color: var(--dim);
+}
+
+.typit-strong {
+  font-weight: 650;
+}
+
+.typit-em {
+  font-style: italic;
+}
+
+.typit-inline-code {
+  font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  background: var(--code-bg);
+  padding: 0.12em 0.32em;
+  border-radius: 4px;
+}
+
+.typit-strike {
+  text-decoration: line-through;
+  color: var(--dim);
+}
+
+.typit-link {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.typit-link:hover {
+  text-decoration: underline;
+}
+
+.typit-quote-line {
+  border-left: 3px solid var(--quote-border);
+  color: var(--quote-fg);
+}
+
+.typit-code-line {
+  background: var(--code-block-bg);
+  font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+/* ---- 状态栏 ---- */
+
+#statusbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-size: 11px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  color: var(--dim);
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  user-select: none;
+}
+
+#doc-dirty {
+  color: var(--accent);
+}
