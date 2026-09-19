@@ -8,6 +8,7 @@
   --quote-border: #d1d5db;
   --quote-fg: #57606a;
   --border: #e5e7eb;
+  --error: #cf222e;
   --syn-keyword: #a626a4;
   --syn-string: #50a14f;
   --syn-number: #986801;
@@ -28,6 +29,7 @@
     --quote-border: #4b5563;
     --quote-fg: #9ca3af;
     --border: #34383f;
+    --error: #f85149;
     --syn-keyword: #c678dd;
     --syn-string: #98c379;
     --syn-number: #d19a66;
@@ -152,6 +154,7 @@ body {
 
 .typit-link:hover {
   text-decoration: underline;
+  cursor: pointer;
 }
 
 .typit-quote-line {
@@ -187,4 +190,13 @@ body {
 
 #doc-dirty {
   color: var(--accent);
+}
+
+/* 错误提示：占据状态栏中间位置，超长时截断，不挤掉两侧信息 */
+#doc-error {
+  color: var(--error);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 55%;
 }

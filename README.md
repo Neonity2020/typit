@@ -6,7 +6,7 @@
 
 - **壳**：Tauri 2（Rust + 系统 WKWebView），空载内存远低于 Electron
 - **编辑器**：CodeMirror 6 + 自研 live-preview 装饰层（`src/livepreview.ts`）
-- **前端**：Vite + TypeScript，无重型框架
+- **前端**：Vite + TypeScript（bun 管理依赖），无重型框架
 - **存储**：磁盘纯 `.md` 文件，无数据库
 - **对话框**：`tauri-plugin-dialog`（系统原生打开/保存面板）
 
@@ -21,10 +21,12 @@
 
 ## 开发
 
+依赖管理使用 [bun](https://bun.sh)（1.2+）：
+
 ```bash
-npm install
-npm run tauri dev    # 开发（自动起 vite + 编译 Rust）
-npm run tauri build  # 打包 .app / .dmg
+bun install
+bun run tauri dev    # 开发（自动起 vite + 编译 Rust）
+bun run tauri build  # 打包 .app / .dmg
 ```
 
 - `Cmd+O` 打开文件，`Cmd+S` 保存（另存为弹出系统面板）

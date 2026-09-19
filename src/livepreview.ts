@@ -134,9 +134,12 @@ export function buildDecorations(view: DecorationInput): Built {
           return
         }
 
-        // 行内 / 引用式链接：光标不在时只留链接文字，隐藏 [ ] ( ) 与 URL
-        if (name === 'Link') {
-          mark(node.from, node.to, 'typit-link')
+        // 链接与图片：光标不在时只留可见文字，隐藏 [ ] ( ) 与 URL。
+        // 引用式（[文字][ref]、![alt][ref]）的 LinkMark 只有 [ 和 ]，[ref] 是挂在
+        // Link/Image 下的独立 LinkLabel 节点，不一起隐藏的话屏幕上会剩下 "文字][ref]"。
+        // 快捷式 [文字] 没有 LinkLabel 子节点，因此不受影响。
+        if (name === 'Link' || name === 'Image') {
+          if (name === 'Link') mark(node.from, node.to, 'typit-link')
           if (!selectionTouches(state, node.from, node.to)) {
             const marks = node.node.getChildren('LinkMark')
             if (marks.length >= 3) {
@@ -144,18 +147,7 @@ export function buildDecorations(view: DecorationInput): Built {
               hide(marks[1].from, node.to)
             } else {
               for (const m of marks) hide(m.from, m.to)
-            }
-          }
-          return
-        }
-        if (name === 'Image') {
-          if (!selectionTouches(state, node.from, node.to)) {
-            const marks = node.node.getChildren('LinkMark')
-            if (marks.length >= 3) {
-              hide(marks[0].from, marks[0].to)
-              hide(marks[1].from, node.to)
-            } else {
-              for (const m of marks) hide(m.from, m.to)
+              for (const label of node.node.getChildren('LinkLabel')) hide(label.from, label.to)
             }
           }
           return
@@ -200,6 +192,49 @@ export function buildDecorations(view: DecorationInput): Built {
     decorations: RangeSet.of(all, true),
     hidden: RangeSet.of(hidden, true),
   }
+}
+
+/**
+ * 位置 pos 处链接的目标 URL；不在链接内或解析不出 URL 时返回 null。
+ * 只认 Link（图片 Image 不参与），引用式链接按标签到同文档的 LinkReference 定义里找。
+ */
+export function linkUrlAt(state: EditorState, pos: number): string | null {
+  const inner = syntaxTree(state).resolveInner(pos, 1)
+  let link = inner.name === 'Link' ? inner : null
+  for (let parent = inner.parent; !link && parent; parent = parent.parent) {
+    if (parent.name === 'Link') link = parent
+  }
+  if (!link) return null
+
+  const url = link.getChild('URL')
+  if (url) return state.doc.sliceString(url.from, url.to)
+
+  // 引用式：[文字][ref] 的标签取自 [ref]；折叠式 [文字][] 与快捷式 [文字]
+  // 没有可用的标签节点，按 CommonMark 用链接文字本身作为标签。
+  const marks = link.getChildren('LinkMark')
+  if (marks.length < 2) return null
+  const labelNode = link.getChild('LinkLabel')
+  const label =
+    labelNode && labelNode.to - labelNode.from > 2
+      ? state.doc.sliceString(labelNode.from + 1, labelNode.to - 1)
+      : state.doc.sliceString(marks[0].to, marks[1].from)
+  if (!label) return null
+
+  const found = { url: null as string | null }
+  syntaxTree(state).iterate({
+    enter: n => {
+      if (found.url !== null || n.name !== 'LinkReference') return
+      const refLabel = n.node.getChild('LinkLabel')
+      const refUrl = n.node.getChild('URL')
+      if (!refLabel || !refUrl) return
+      const name = state.doc.sliceString(refLabel.from + 1, refLabel.to - 1)
+      // CommonMark 的标签匹配不区分大小写
+      if (name.toLowerCase() === label.toLowerCase()) {
+        found.url = state.doc.sliceString(refUrl.from, refUrl.to)
+      }
+    },
+  })
+  return found.url
 }
 
 export const livePreview = ViewPlugin.fromClass(
